@@ -1,4 +1,4 @@
-# Trigger auto-deploy after private key fix
+# Active deploy pipeline for NexToolX after SSH root permissions fix
 name: CI/CD Pipeline for NexToolX
 
 on:
