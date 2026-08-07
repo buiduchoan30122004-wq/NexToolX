@@ -1,0 +1,74 @@
+name: CI/CD Pipeline for NexToolX
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Tải code từ GitHub về máy ảo của GitHub
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Cài đặt Node.js môi trường build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Cài đặt thư viện và đóng gói ứng dụng React
+      - name: Install Dependencies & Build Apps
+        run: |
+          npm install
+          npm --prefix frontend install
+          npm --prefix admin install
+          npm run build:all
+
+      # 4. Tải file Frontend lên VPS bằng rsync qua SSH
+      - name: Deploy Frontend to VPS
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-avz --delete"
+          SOURCE: "frontend/dist/"
+          REMOTE_HOST: "84.75.144.17"
+          REMOTE_USER: "root"
+          TARGET: "/var/www/nextoolx/frontend/dist"
+
+      # 5. Tải file Admin CRM lên VPS bằng rsync qua SSH
+      - name: Deploy Admin to VPS
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-avz --delete"
+          SOURCE: "admin/dist/"
+          REMOTE_HOST: "84.75.144.17"
+          REMOTE_USER: "root"
+          TARGET: "/var/www/nextoolx/admin/dist"
+
+      # 6. Tải mã nguồn Backend lên VPS (loại trừ node_modules và db)
+      - name: Deploy Backend to VPS
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-avz --exclude 'node_modules' --exclude 'database.sqlite'"
+          SOURCE: "backend/"
+          REMOTE_HOST: "84.75.144.17"
+          REMOTE_USER: "root"
+          TARGET: "/var/www/nextoolx/backend"
+
+      # 7. Khởi động lại dịch vụ Backend bằng PM2 trên VPS qua SSH
+      - name: Restart Backend PM2 on VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: "84.75.144.17"
+          username: "root"
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/nextoolx/backend
+            npm install --production
+            pm2 restart nextoolx-backend || pm2 start index.js --name "nextoolx-backend"
