@@ -196,7 +196,7 @@ h1, h2, h3, h4, h5, h6 {
 .site-footer {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
-  padding: 48px 24px 24px;
+  padding: 64px 24px 32px;
   z-index: 2;
 }
 
@@ -205,14 +205,35 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 48px;
 }
 
 .footer-top {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+}
+
+@media (max-width: 968px) {
+  .footer-top {
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 32px;
+  }
+  .footer-info {
+    grid-column: span 3;
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .footer-info {
+    grid-column: span 1;
+  }
 }
 
 .footer-info {
@@ -222,13 +243,31 @@ h1, h2, h3, h4, h5, h6 {
 .footer-info p {
   color: var(--text-secondary);
   margin-top: 12px;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-col-title {
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .footer-menu-list {
   display: flex;
-  gap: 24px;
+  flex-direction: column;
+  gap: 12px;
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .footer-link {
@@ -240,18 +279,65 @@ h1, h2, h3, h4, h5, h6 {
 
 .footer-link:hover {
   color: var(--primary);
+  padding-left: 4px;
+}
+
+.footer-link-icon {
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-link-icon:hover {
+  color: var(--primary);
+  transform: translateY(-2px);
 }
 
 .footer-bottom {
   border-top: 1px solid var(--border);
-  padding-top: 24px;
+  padding-top: 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 24px;
   font-size: 14px;
   color: var(--text-muted);
+}
+
+/* Payment & Trust Badges */
+.secure-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.payment-methods {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.payment-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: var(--transition-smooth);
+}
+
+.payment-icon:hover {
+  opacity: 1;
+  transform: translateY(-2px);
 }
 
 /* Cards & Grids */
