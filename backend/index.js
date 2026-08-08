@@ -73,6 +73,78 @@ async function updateSeo(db, seoId, seoData) {
   `, [seo_title, meta_description, canonical_url, og_title, og_description, og_image, twitter_card, index_follow, schema_json, seoId]);
 }
 
+// ----------------- SEO & SITEMAP ROUTES -----------------
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const db = await getDb();
+    
+    // Fetch all active/published tools
+    const tools = await db.all("SELECT slug, updated_at FROM tools WHERE status = 'approved' AND published = 1");
+    // Fetch all published blogs
+    const blogs = await db.all("SELECT slug, updated_at FROM blogs WHERE status = 'published'");
+    // Fetch all categories
+    const categories = await db.all("SELECT slug FROM categories");
+    // Fetch all collections
+    const collections = await db.all("SELECT slug FROM collections");
+
+    const baseUrl = 'https://nextoolx.com';
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    // Static pages
+    const staticPages = [
+      '',
+      '/browse',
+      '/categories',
+      '/collections',
+      '/deals',
+      '/blog',
+      '/submit-tool',
+      '/about',
+      '/contact',
+      '/privacy',
+      '/terms'
+    ];
+
+    const today = new Date().toISOString().split('T')[0];
+
+    staticPages.forEach(page => {
+      xml += `  <url>\n    <loc>${baseUrl}${page}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>${page === '' ? '1.0' : '0.8'}</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Tools pages
+    tools.forEach(tool => {
+      const lastmod = tool.updated_at ? tool.updated_at.split(' ')[0] : today;
+      xml += `  <url>\n    <loc>${baseUrl}/tool/${tool.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Blog pages
+    blogs.forEach(blog => {
+      const lastmod = blog.updated_at ? blog.updated_at.split(' ')[0] : today;
+      xml += `  <url>\n    <loc>${baseUrl}/blog/${blog.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Category pages
+    categories.forEach(cat => {
+      xml += `  <url>\n    <loc>${baseUrl}/categories#${cat.slug}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
+    });
+
+    // Dynamic Collection pages
+    collections.forEach(col => {
+      xml += `  <url>\n    <loc>${baseUrl}/collections#${col.slug}</loc>\n    <changefreq>weekly</changefreq>\n    <priority>0.5</priority>\n  </url>\n`;
+    });
+
+    xml += '</urlset>';
+
+    res.header('Content-Type', 'application/xml');
+    res.status(200).send(xml);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // ----------------- API ROUTES -----------------
 
 // 1. Dashboard Metrics
