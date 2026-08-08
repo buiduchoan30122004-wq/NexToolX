@@ -65,10 +65,10 @@ function Sidebar({ onLogout }) {
   return (
     <aside className="crm-sidebar">
       <NavLink to="/" className="sidebar-logo">
-        <div className="logo-icon" style={{ width: '32px', height: '32px' }}>
-          <Sparkles size={16} fill="#fff" />
+        <div className="logo-icon" style={{ width: '32px', height: '32px', background: 'var(--primary)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Sparkles size={16} fill="#fff" color="#fff" />
         </div>
-        <span>NexCRM</span>
+        <span style={{ color: '#0f172a' }}>Nex<span style={{ color: 'var(--primary)' }}>CRM</span></span>
       </NavLink>
 
       <nav style={{ flex: 1 }}>
