@@ -23,6 +23,9 @@ jobs:
 
       # 3. Đóng gói mã nguồn React
       - name: Install Dependencies & Build Apps
+        env:
+          VITE_API_URL: https://nextoolx.com/api
+          VITE_UPLOADS_URL: https://nextoolx.com
         run: |
           npm install
           npm --prefix frontend install
