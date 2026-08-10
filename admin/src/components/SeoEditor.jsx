@@ -90,6 +90,30 @@ function SeoEditor({ seoData, onChange }) {
         </div>
       </div>
 
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+        <div className="form-group">
+          <label>Open Graph Image URL</label>
+          <input
+            type="text"
+            className="form-control"
+            value={seoData?.og_image || ''}
+            onChange={(e) => handleChange('og_image', e.target.value)}
+            placeholder="https://example.com/share-image.png (or leave blank to use gallery)"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Open Graph Description</label>
+          <input
+            type="text"
+            className="form-control"
+            value={seoData?.og_description || ''}
+            onChange={(e) => handleChange('og_description', e.target.value)}
+            placeholder="Facebook share description"
+          />
+        </div>
+      </div>
+
       <div className="form-group">
         <label>JSON Schema Structured Data</label>
         <textarea
