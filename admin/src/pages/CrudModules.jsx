@@ -527,9 +527,13 @@ export function ToolsManager() {
       if (res.ok) {
         setShowModal(false);
         fetchDependencies();
+      } else {
+        const errorData = await res.json();
+        alert(`Error saving tool: ${errorData.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
+      alert(`Network error saving tool: ${err.message}`);
     }
   };
 

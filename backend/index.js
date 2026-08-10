@@ -1041,6 +1041,7 @@ app.post('/api/tools', async (req, res) => {
 
     res.status(201).json({ id: toolId, name, slug, status });
   } catch (error) {
+    console.error('Error in POST /api/tools:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -1104,6 +1105,7 @@ app.put('/api/tools/:id', async (req, res) => {
     
     res.json({ id: toolId, name, slug, status });
   } catch (error) {
+    console.error('Error in PUT /api/tools/:id:', error);
     res.status(500).json({ error: error.message });
   }
 });
