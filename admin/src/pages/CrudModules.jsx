@@ -223,6 +223,12 @@ export function ToolsManager() {
   const [activeTab, setActiveTab] = useState('affiliate'); // 'affiliate' or 'paid'
   const [seo, setSeo] = useState({ seo_title: '', meta_description: '', canonical_url: '', og_title: '', og_description: '', og_image: '', twitter_card: 'summary_large_image', index_follow: 'index, follow', schema_json: '' });
 
+  // AI Scraped Detailed Fields States (Lists as newline-separated text)
+  const [keyFeaturesText, setKeyFeaturesText] = useState('');
+  const [useCasesText, setUseCasesText] = useState('');
+  const [whoIsItForText, setWhoIsItForText] = useState('');
+  const [pricingPlansText, setPricingPlansText] = useState('');
+
   // AI Scraper states & handler
   const [scraping, setScraping] = useState(false);
   const [scrapeError, setScrapeError] = useState('');
@@ -266,6 +272,23 @@ export function ToolsManager() {
           og_image: tool.banner_url || prev.og_image || '',
           schema_json: tool.schema_json || prev.schema_json || ''
         }));
+
+        try {
+          const parsedFeatures = JSON.parse(tool.key_features || '[]');
+          setKeyFeaturesText(Array.isArray(parsedFeatures) ? parsedFeatures.join('\n') : '');
+        } catch (_) {}
+        try {
+          const parsedCases = JSON.parse(tool.use_cases || '[]');
+          setUseCasesText(Array.isArray(parsedCases) ? parsedCases.join('\n') : '');
+        } catch (_) {}
+        try {
+          const parsedWho = JSON.parse(tool.who_is_it_for || '[]');
+          setWhoIsItForText(Array.isArray(parsedWho) ? parsedWho.join('\n') : '');
+        } catch (_) {}
+        try {
+          const parsedPlans = JSON.parse(tool.pricing_plans || '[]');
+          setPricingPlansText(Array.isArray(parsedPlans) ? parsedPlans.map(p => `${p.name}: ${p.price}`).join('\n') : '');
+        } catch (_) {}
         
         if (tool.categories && Array.isArray(tool.categories)) {
           setSelectedCats(tool.categories);
@@ -443,6 +466,10 @@ export function ToolsManager() {
     setIsPaidSubmission(0);
     setContactEmail('');
     setSeo({ seo_title: '', meta_description: '', canonical_url: '', og_title: '', og_description: '', og_image: '', twitter_card: 'summary_large_image', index_follow: 'index, follow', schema_json: '' });
+    setKeyFeaturesText('');
+    setUseCasesText('');
+    setWhoIsItForText('');
+    setPricingPlansText('');
     setShowModal(true);
   };
 
@@ -482,6 +509,24 @@ export function ToolsManager() {
           index_follow: tool.index_follow || 'index, follow',
           schema_json: tool.schema_json || ''
         });
+
+        try {
+          const parsedFeatures = JSON.parse(tool.key_features || '[]');
+          setKeyFeaturesText(Array.isArray(parsedFeatures) ? parsedFeatures.join('\n') : '');
+        } catch (_) { setKeyFeaturesText(''); }
+        try {
+          const parsedCases = JSON.parse(tool.use_cases || '[]');
+          setUseCasesText(Array.isArray(parsedCases) ? parsedCases.join('\n') : '');
+        } catch (_) { setUseCasesText(''); }
+        try {
+          const parsedWho = JSON.parse(tool.who_is_it_for || '[]');
+          setWhoIsItForText(Array.isArray(parsedWho) ? parsedWho.join('\n') : '');
+        } catch (_) { setWhoIsItForText(''); }
+        try {
+          const parsedPlans = JSON.parse(tool.pricing_plans || '[]');
+          setPricingPlansText(Array.isArray(parsedPlans) ? parsedPlans.map(p => `${p.name}: ${p.price}`).join('\n') : '');
+        } catch (_) { setPricingPlansText(''); }
+
         setShowModal(true);
       }
     } catch (err) {
@@ -513,7 +558,17 @@ export function ToolsManager() {
       pricing_type: pricingType, pricing_details: pricingDetails, verified, featured, published, status,
       categories: selectedCats, tags: selectedTags, collections: selectedColls, gallery, seo,
       is_paid_submission: isPaidSubmission,
-      contact_email: contactEmail
+      contact_email: contactEmail,
+      key_features: JSON.stringify(keyFeaturesText.split('\n').map(x => x.trim()).filter(Boolean)),
+      use_cases: JSON.stringify(useCasesText.split('\n').map(x => x.trim()).filter(Boolean)),
+      who_is_it_for: JSON.stringify(whoIsItForText.split('\n').map(x => x.trim()).filter(Boolean)),
+      pricing_plans: JSON.stringify(pricingPlansText.split('\n').map(line => {
+        const parts = line.split(':');
+        if (parts.length >= 2) {
+          return { name: parts[0].trim(), price: parts.slice(1).join(':').trim() };
+        }
+        return { name: line.trim(), price: 'Free' };
+      }).filter(p => p.name))
     };
 
     try {
@@ -961,6 +1016,35 @@ export function ToolsManager() {
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
                   </select>
+                </div>
+              </div>
+
+              {/* AI Auto-Scraped Detailed Fields */}
+              <div style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h4 style={{ margin: 0, fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  ✨ AI Scraped Detailed Fields (One item per line)
+                </h4>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label style={{ fontSize: '12px' }}>Key Features</label>
+                    <textarea className="form-control" style={{ fontSize: '13px' }} rows="3" value={keyFeaturesText} onChange={(e) => setKeyFeaturesText(e.target.value)} placeholder="e.g.&#10;Automated UGC video production&#10;Generates high-converting scripts"></textarea>
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label style={{ fontSize: '12px' }}>Use Cases</label>
+                    <textarea className="form-control" style={{ fontSize: '13px' }} rows="3" value={useCasesText} onChange={(e) => setUseCasesText(e.target.value)} placeholder="e.g.&#10;Create UGC ads from product URL&#10;Translate voiceovers for global markets"></textarea>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label style={{ fontSize: '12px' }}>Who is it for?</label>
+                    <textarea className="form-control" style={{ fontSize: '13px' }} rows="3" value={whoIsItForText} onChange={(e) => setWhoIsItForText(e.target.value)} placeholder="e.g.&#10;Content creators&#10;E-commerce sellers"></textarea>
+                  </div>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label style={{ fontSize: '12px' }}>Pricing Plans (Format: PlanName: Price)</label>
+                    <textarea className="form-control" style={{ fontSize: '13px' }} rows="3" value={pricingPlansText} onChange={(e) => setPricingPlansText(e.target.value)} placeholder="e.g.&#10;Starter: $20/mo&#10;Growth: $35/mo"></textarea>
+                  </div>
                 </div>
               </div>
 

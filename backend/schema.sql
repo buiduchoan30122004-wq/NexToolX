@@ -76,6 +76,10 @@ CREATE TABLE IF NOT EXISTS tools (
     contact_email TEXT,
     is_paid_submission INTEGER DEFAULT 0,
     seo_id INTEGER REFERENCES seos(id) ON DELETE SET NULL,
+    key_features TEXT,
+    use_cases TEXT,
+    who_is_it_for TEXT,
+    pricing_plans TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

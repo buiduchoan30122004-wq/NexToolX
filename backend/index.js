@@ -973,17 +973,19 @@ app.post('/api/tools', async (req, res) => {
     const {
       name, slug, short_description, full_description, logo, website_url, affiliate_url,
       pricing_type, pricing_details, verified, featured, published, status, seo,
-      categories, tags, collections, gallery, contact_email, is_paid_submission
+      categories, tags, collections, gallery, contact_email, is_paid_submission,
+      key_features, use_cases, who_is_it_for, pricing_plans
     } = req.body;
     
     const seoId = await getOrCreateSeo(db, seo);
     
     const result = await db.run(`
-      INSERT INTO tools (name, slug, short_description, full_description, logo, website_url, affiliate_url, pricing_type, pricing_details, verified, featured, published, status, contact_email, is_paid_submission, seo_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tools (name, slug, short_description, full_description, logo, website_url, affiliate_url, pricing_type, pricing_details, verified, featured, published, status, contact_email, is_paid_submission, seo_id, key_features, use_cases, who_is_it_for, pricing_plans)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       name, slug, short_description, full_description, logo, website_url, affiliate_url,
-      pricing_type || 'Freemium', pricing_details, verified ? 1 : 0, featured ? 1 : 0, published ? 1 : 0, status || 'pending', contact_email, is_paid_submission ? 1 : 0, seoId
+      pricing_type || 'Freemium', pricing_details, verified ? 1 : 0, featured ? 1 : 0, published ? 1 : 0, status || 'pending', contact_email, is_paid_submission ? 1 : 0, seoId,
+      key_features || '[]', use_cases || '[]', who_is_it_for || '[]', pricing_plans || '[]'
     ]);
     
     const toolId = result.lastID;
@@ -1053,7 +1055,8 @@ app.put('/api/tools/:id', async (req, res) => {
     const {
       name, slug, short_description, full_description, logo, website_url, affiliate_url,
       pricing_type, pricing_details, verified, featured, published, status, seo_id, seo,
-      categories, tags, collections, gallery, contact_email, is_paid_submission
+      categories, tags, collections, gallery, contact_email, is_paid_submission,
+      key_features, use_cases, who_is_it_for, pricing_plans
     } = req.body;
     
     let finalSeoId = seo_id;
@@ -1068,11 +1071,13 @@ app.put('/api/tools/:id', async (req, res) => {
     await db.run(`
       UPDATE tools SET 
         name = ?, slug = ?, short_description = ?, full_description = ?, logo = ?, website_url = ?, affiliate_url = ?,
-        pricing_type = ?, pricing_details = ?, verified = ?, featured = ?, published = ?, status = ?, contact_email = ?, is_paid_submission = ?, seo_id = ?, updated_at = CURRENT_TIMESTAMP
+        pricing_type = ?, pricing_details = ?, verified = ?, featured = ?, published = ?, status = ?, contact_email = ?, is_paid_submission = ?, seo_id = ?,
+        key_features = ?, use_cases = ?, who_is_it_for = ?, pricing_plans = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `, [
       name, slug, short_description, full_description, logo, website_url, affiliate_url,
-      pricing_type, pricing_details, verified ? 1 : 0, featured ? 1 : 0, published ? 1 : 0, status, contact_email, is_paid_submission ? 1 : 0, finalSeoId, toolId
+      pricing_type, pricing_details, verified ? 1 : 0, featured ? 1 : 0, published ? 1 : 0, status, contact_email, is_paid_submission ? 1 : 0, finalSeoId,
+      key_features || '[]', use_cases || '[]', who_is_it_for || '[]', pricing_plans || '[]', toolId
     ]);
     
     // Clear relations

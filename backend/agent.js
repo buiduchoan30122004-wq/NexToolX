@@ -250,6 +250,28 @@ The response JSON must strictly match the structure below. Do NOT wrap the JSON 
   "full_description": "A comprehensive description in Markdown format (1-2 paragraphs), highlighting core features and user benefits.",
   "pricing_type": "Must be exactly one of: 'Free', 'Freemium', 'Paid', 'Free Trial'",
   "pricing_details": "Short details of plans (e.g., 'Free 50 credits/mo, Pro starts at $20/mo' or 'Contact website for pricing')",
+  "key_features": [
+    "Array of 3 to 5 core features of the tool, extracted from the page text.",
+    "e.g. 'Automated UGC-style video ad production for TikTok, Instagram'",
+    "e.g. 'Generates scripts, natural-sounding voiceovers, and hooks'"
+  ],
+  "use_cases": [
+    "Array of 2 to 4 real-world use cases or tasks this tool can perform.",
+    "e.g. 'Create high-converting UGC-style video ads from a single product URL'",
+    "e.g. 'Run multilingual ad campaigns by turning product images into localized demo videos'"
+  ],
+  "who_is_it_for": [
+    "Array of 3 to 5 target audience segments or roles this tool is built for.",
+    "e.g. 'Content creators'",
+    "e.g. 'E-commerce sellers'",
+    "e.g. 'Marketing agencies'"
+  ],
+  "pricing_plans": [
+    // Array of objects representing the tool's subscription plans if visible or mentioned.
+    // If not visible, return empty array [].
+    { "name": "Starter", "price": "$20/mo" },
+    { "name": "Growth", "price": "$35/mo" }
+  ],
   "seo_title": "Optimized SEO title (under 60 characters)",
   "meta_description": "SEO meta description (under 160 characters)",
   "category_ids": [array of matched existing category IDs, e.g. [2]],
@@ -366,6 +388,10 @@ If pricing details are not clear on the website, use "pricing_type": "Freemium" 
         seo_title: parsedData.seo_title,
         meta_description: parsedData.meta_description,
         schema_json: parsedData.schema_json ? (typeof parsedData.schema_json === 'object' ? JSON.stringify(parsedData.schema_json, null, 2) : parsedData.schema_json) : '',
+        key_features: parsedData.key_features ? (typeof parsedData.key_features === 'object' ? JSON.stringify(parsedData.key_features) : parsedData.key_features) : '[]',
+        use_cases: parsedData.use_cases ? (typeof parsedData.use_cases === 'object' ? JSON.stringify(parsedData.use_cases) : parsedData.use_cases) : '[]',
+        who_is_it_for: parsedData.who_is_it_for ? (typeof parsedData.who_is_it_for === 'object' ? JSON.stringify(parsedData.who_is_it_for) : parsedData.who_is_it_for) : '[]',
+        pricing_plans: parsedData.pricing_plans ? (typeof parsedData.pricing_plans === 'object' ? JSON.stringify(parsedData.pricing_plans) : parsedData.pricing_plans) : '[]',
         categories: finalCategoryIds,
         tags: finalTagIds,
         logo_url: logoUrl,
